@@ -97,27 +97,17 @@ export default function PaywallClient({ baseUrl }: Props) {
                 </div>
               </div>
 
-              {/* CLI commands */}
-              <div className="space-y-2">
+              {/* CLI command */}
+              <div className="space-y-1.5">
                 <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">
-                  Test with a CLI
+                  Test with mppx CLI
                 </p>
                 <div
-                  className="bg-zinc-900 rounded-md px-3 py-2.5 cursor-pointer"
+                  className="bg-zinc-900 rounded-md px-3 py-2.5 cursor-pointer group"
                   onClick={() => copy(`npx mppx ${endpointUrl}`)}
                 >
-                  <p className="text-xs text-zinc-500 font-mono mb-0.5">mppx</p>
                   <code className="text-xs text-zinc-100 font-mono">
                     <span className="text-zinc-500">$</span> npx mppx {endpointUrl}
-                  </code>
-                </div>
-                <div
-                  className="bg-zinc-900 rounded-md px-3 py-2.5 cursor-pointer"
-                  onClick={() => copy(`purl ${endpointUrl}`)}
-                >
-                  <p className="text-xs text-zinc-500 font-mono mb-0.5">purl</p>
-                  <code className="text-xs text-zinc-100 font-mono">
-                    <span className="text-zinc-500">$</span> purl {endpointUrl}
                   </code>
                 </div>
               </div>
