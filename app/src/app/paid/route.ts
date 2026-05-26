@@ -58,15 +58,18 @@ export async function GET(request: Request): Promise<Response> {
   } catch {}
 
   const amount = method === 'stripe' ? SPT_AMOUNT : TEMPO_AMOUNT
-  const params = new URLSearchParams({ amount, method, ts: now })
+  const payload = { amount, method, ts: now }
+  const signingKey = process.env.MPP_SECRET_KEY
+  const sig = signingKey
+    ? crypto.createHmac('sha256', signingKey).update(JSON.stringify(payload)).digest('base64url')
+    : null
+  const token = Buffer.from(JSON.stringify({ ...payload, sig })).toString('base64url')
 
   return result.withReceipt(
     Response.json({
-      message: 'Payment verified.',
-      content:
-        'Machines can now transact directly — no forms, no accounts, no friction. This is the future of agentic commerce.',
+      joke: 'Have you heard the joke about yoga? Nevermind, it\'s a bit of a stretch.',
       timestamp: now,
-      successUrl: `${protocol}//${host}/success?${params.toString()}`,
+      successUrl: `${protocol}//${host}/success?token=${token}`,
     }),
   )
 }
