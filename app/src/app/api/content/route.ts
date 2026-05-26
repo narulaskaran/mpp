@@ -22,7 +22,8 @@ const mppx = Mppx.create({
 
 const AMOUNT = process.env.PAYMENT_AMOUNT ?? '0.01'
 
-export const GET = mppx.tempo.charge({ amount: AMOUNT })(() => {
+export const GET = mppx.tempo.charge({ amount: AMOUNT })((request: Request) => {
+  const { protocol, host } = new URL(request.url)
   const now = new Date().toISOString()
   const params = new URLSearchParams({ amount: AMOUNT, method: 'tempo', ts: now })
   return Response.json({
@@ -30,6 +31,6 @@ export const GET = mppx.tempo.charge({ amount: AMOUNT })(() => {
     content:
       'Machines can now transact directly — no forms, no accounts, no friction. This is the future of agentic commerce.',
     timestamp: now,
-    successUrl: `/success?${params.toString()}`,
+    successUrl: `${protocol}//${host}/success?${params.toString()}`,
   })
 })
