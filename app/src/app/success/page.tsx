@@ -58,15 +58,6 @@ export default async function SuccessPage({ searchParams }: { searchParams: Sear
         </div>
       </main>
 
-      <footer className="border-t border-zinc-200 px-8 py-5 flex items-center justify-between">
-        <p className="text-sm text-zinc-400">
-          Built with{' '}
-          <a href="https://mpp.dev" className="underline underline-offset-2 hover:text-zinc-600">
-            Machine Payments Protocol
-          </a>
-        </p>
-        <p className="text-sm text-zinc-400">Stripe + Tempo</p>
-      </footer>
     </div>
   )
 }
