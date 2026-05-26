@@ -67,12 +67,15 @@ export default function PaywallClient({ baseUrl }: Props) {
                     required.
                   </p>
                 </div>
-                <div className="flex gap-1.5 shrink-0 ml-4">
+                <div className="flex gap-1.5 shrink-0 ml-4 flex-wrap justify-end">
                   <Badge className="bg-zinc-900 text-white text-xs font-normal hover:bg-zinc-900">
                     0.01 USDC
                   </Badge>
                   <Badge variant="outline" className="text-xs font-normal text-zinc-500 border-zinc-200">
                     Tempo
+                  </Badge>
+                  <Badge variant="outline" className="text-xs font-normal text-zinc-500 border-zinc-200">
+                    or $0.50 via Link
                   </Badge>
                 </div>
               </div>

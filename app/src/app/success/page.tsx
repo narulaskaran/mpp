@@ -62,7 +62,9 @@ export default async function SuccessPage({ searchParams }: { searchParams: Sear
             <CardContent className="pt-4 space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-xs text-zinc-500">Amount</span>
-                <span className="text-xs font-medium text-zinc-900">{amount ?? '0.01'} USDC</span>
+                <span className="text-xs font-medium text-zinc-900">
+                  {amount ?? '0.01'} {method === 'stripe' ? 'USD' : 'USDC'}
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-xs text-zinc-500">Method</span>
