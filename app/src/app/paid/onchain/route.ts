@@ -65,8 +65,8 @@ async function generateJoke(): Promise<{ joke: string; account: ReturnType<typeo
   const walletKey = process.env.TEMPO_RECIPIENT_KEY
   if (!walletKey) return { joke: FALLBACK_JOKE, account: null }
 
+  const account = privateKeyToAccount(walletKey as `0x${string}`)
   try {
-    const account = privateKeyToAccount(walletKey as `0x${string}`)
     const client = MppxClient.create({
       polyfill: false,
       methods: [tempoClient({ account })],
@@ -91,12 +91,16 @@ async function generateJoke(): Promise<{ joke: string; account: ReturnType<typeo
       }),
     })
 
-    if (!res.ok) return { joke: FALLBACK_JOKE, account }
+    if (!res.ok) {
+      console.error('[joke] OpenAI non-ok:', res.status, await res.text().catch(() => ''))
+      return { joke: FALLBACK_JOKE, account }
+    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data = await res.json() as any
     return { joke: data.choices?.[0]?.message?.content?.trim() ?? FALLBACK_JOKE, account }
-  } catch {
-    return { joke: FALLBACK_JOKE, account: null }
+  } catch (err) {
+    console.error('[joke] OpenAI error:', err)
+    return { joke: FALLBACK_JOKE, account }
   }
 }
 

@@ -112,27 +112,34 @@ export default function PaywallClient({ baseUrl }: Props) {
               </div>
               <div className="w-full rounded-2xl px-4 py-3 space-y-1" style={{ backgroundColor: '#00A63A' }}>
                 {[
-                  { cmd: stripe_link, key: 'stripe_link' },
+                  { cmd: stripe_link, key: 'stripe_link', tooltip: 'Requires a spend request first — run: link-cli spend-request create' },
                   { cmd: stripe_mppx, key: 'stripe_mppx' },
                   { cmd: stripe_tempo, key: 'stripe_tempo' },
-                ].map(({ cmd, key }) => (
-                  <button
-                    key={key}
-                    className="w-full text-left rounded-xl px-3 py-2 flex items-center justify-between gap-4 cursor-pointer transition-colors"
-                    style={{ backgroundColor: 'transparent' }}
-                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.12)')}
-                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-                    onMouseDown={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.2)')}
-                    onMouseUp={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.12)')}
-                    onClick={() => copy(cmd, key)}
-                  >
-                    <code className="text-sm font-mono truncate" style={{ color: 'rgba(255,255,255,0.9)' }}>
-                      <span style={{ color: 'rgba(255,255,255,0.5)' }}>$ </span>{cmd}
-                    </code>
-                    {copied === key
-                      ? <Check size={13} style={{ color: 'rgba(255,255,255,0.6)' }} className="shrink-0" />
-                      : <CopyIcon size={13} style={{ color: 'rgba(255,255,255,0.6)' }} className="shrink-0" />}
-                  </button>
+                ].map(({ cmd, key, tooltip }) => (
+                  <div key={key} className="relative group/cmd">
+                    <button
+                      className="w-full text-left rounded-xl px-3 py-2 flex items-center justify-between gap-4 cursor-pointer transition-colors"
+                      style={{ backgroundColor: 'transparent' }}
+                      onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.12)')}
+                      onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                      onMouseDown={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.2)')}
+                      onMouseUp={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.12)')}
+                      onClick={() => copy(cmd, key)}
+                    >
+                      <code className="text-sm font-mono truncate" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>$ </span>{cmd}
+                      </code>
+                      {copied === key
+                        ? <Check size={13} style={{ color: 'rgba(255,255,255,0.6)' }} className="shrink-0" />
+                        : <CopyIcon size={13} style={{ color: 'rgba(255,255,255,0.6)' }} className="shrink-0" />}
+                    </button>
+                    {tooltip && (
+                      <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-zinc-800 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover/cmd:opacity-100 transition-opacity pointer-events-none z-10">
+                        {tooltip}
+                        <div className="absolute top-full left-4 border-4 border-transparent border-t-zinc-800" />
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
