@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "node -e \"const fs=require('fs');const f='node_modules/mppx/dist/stripe/internal/constants.js';fs.writeFileSync(f,fs.readFileSync(f,'utf8').replace(/'2026-02-25.preview'/,\\\"'2026-03-04.preview'\\\"))\""
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
