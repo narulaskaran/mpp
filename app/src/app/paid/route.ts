@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import { waitUntil } from '@vercel/functions'
 import { Credential } from 'mppx'
 import { Mppx as MppxClient, tempo as tempoClient } from 'mppx/client'
 import { Mppx, stripe, tempo } from 'mppx/server'
@@ -161,8 +162,7 @@ export async function GET(request: Request): Promise<Response> {
   const amount = method === 'stripe' ? SPT_AMOUNT : TEMPO_AMOUNT
   const { joke, account } = await generateJoke()
 
-  // fire-and-forget sweep after DeepSeek call
-  if (account) sweepToPersonalWallet(account).catch(console.error)
+  if (account) waitUntil(sweepToPersonalWallet(account).catch(console.error))
 
   const payload = { amount, method, ts: now, joke }
   const signingKey = process.env.MPP_SECRET_KEY
