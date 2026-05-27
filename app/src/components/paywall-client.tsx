@@ -8,6 +8,7 @@ type Props = { baseUrl: string }
 export default function PaywallClient({ baseUrl }: Props) {
   const endpointUrl = `${baseUrl}/paid`
   const mppxCmd = `npx mppx ${endpointUrl}`
+  const tempoCmd = `tempo request ${endpointUrl}`
   const linkCmd = `link-cli mpp pay ${endpointUrl}`
   const [copied, setCopied] = useState<string | null>(null)
 
@@ -60,6 +61,19 @@ export default function PaywallClient({ baseUrl }: Props) {
               </div>
               <code className="block text-base font-mono text-zinc-300 truncate">
                 <span className="text-zinc-400">$ </span>{mppxCmd}
+              </code>
+            </button>
+
+            <button
+              className="w-full text-left bg-zinc-700 hover:bg-zinc-600 active:bg-zinc-800 transition-colors rounded-2xl px-6 py-5 space-y-3 cursor-pointer"
+              onClick={() => copy(tempoCmd, 'tempo')}
+            >
+              <div className="flex items-baseline justify-between">
+                <span className="text-2xl font-semibold text-white">$0.05 <span className="text-base font-normal text-zinc-300 ml-1">USDC.e via Tempo CLI</span></span>
+                {copied === 'tempo' ? <Check size={15} className="text-zinc-400" /> : <CopyIcon size={15} className="text-zinc-400" />}
+              </div>
+              <code className="block text-base font-mono text-zinc-300 truncate">
+                <span className="text-zinc-400">$ </span>{tempoCmd}
               </code>
             </button>
 
