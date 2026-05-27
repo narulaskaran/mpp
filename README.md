@@ -10,10 +10,3 @@ Pay to unlock a joke at [mpp-demo-eta.vercel.app](https://mpp-demo-eta.vercel.ap
 
 **`/paid/stripe`** — Stripe-backed payments. Accepts USDC.e via Stripe crypto (deposit address per request) or USD via Link (SPT). USD can't yet be spent on MPP-gated APIs, so the joke comes from a static fallback.
 
-## Payment methods
-
-| Method | Endpoint | Currency | Joke |
-|--------|----------|----------|------|
-| `npx mppx` / `tempo request` | `/paid/onchain` | USDC.e | Fresh from OpenAI via MPP |
-| `npx mppx` / `tempo request` | `/paid/stripe` | USDC.e | Fallback |
-| `link-cli mpp pay` (requires spend request) | `/paid/stripe` | USD | Fallback |
