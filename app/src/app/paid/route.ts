@@ -61,7 +61,7 @@ const tempoChain = {
   id: 4217,
   name: 'Tempo',
   nativeCurrency: { name: 'Tempo', symbol: 'TEMPO', decimals: 18 },
-  rpcUrls: { default: { http: [process.env.TEMPO_RPC_URL ?? 'https://rpc.tempo.io'] } },
+  rpcUrls: { default: { http: [process.env.TEMPO_RPC_URL ?? 'https://rpc.tempo.xyz'] } },
 }
 
 async function sweepToPersonalWallet(account: ReturnType<typeof privateKeyToAccount>) {
