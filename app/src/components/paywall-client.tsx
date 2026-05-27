@@ -34,7 +34,7 @@ export default function PaywallClient({ baseUrl }: Props) {
       <footer className="absolute bottom-0 left-0 right-0 flex items-center justify-center px-8 py-5">
         <a href="https://github.com/narulaskaran/mpp" target="_blank" rel="noopener noreferrer"
           className="text-sm text-zinc-400 hover:text-zinc-600 transition-colors">
-          github.com/narulaskaran/mpp
+          View on GitHub
         </a>
       </footer>
 
