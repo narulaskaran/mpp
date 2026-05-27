@@ -68,10 +68,13 @@ const tempoChain = {
 async function sweepToPersonalWallet(account: ReturnType<typeof privateKeyToAccount>) {
   const sweepTo = process.env.SWEEP_TO as `0x${string}` | undefined
   const currency = process.env.TEMPO_CURRENCY as `0x${string}` | undefined
-  if (!sweepTo || !currency) return
+  if (!sweepTo || !currency) {
+    console.log('[sweep] skipped: SWEEP_TO or TEMPO_CURRENCY not set')
+    return
+  }
 
   try {
-    const rpcUrl = process.env.TEMPO_RPC_URL ?? 'https://rpc.tempo.io'
+    const rpcUrl = process.env.TEMPO_RPC_URL ?? 'https://rpc.tempo.xyz'
     const transport = http(rpcUrl)
     const publicClient = createPublicClient({ chain: tempoChain, transport })
     const walletClient = createWalletClient({ chain: tempoChain, transport, account })
@@ -85,15 +88,21 @@ async function sweepToPersonalWallet(account: ReturnType<typeof privateKeyToAcco
 
     // keep 0.005 USDC reserve for gas
     const gasReserve = parseUnits('0.005', 6)
-    if (balance <= gasReserve) return
+    if (balance <= gasReserve) {
+      console.log('[sweep] skipped: balance at or below reserve', balance.toString())
+      return
+    }
 
+    const amount = balance - gasReserve
+    console.log('[sweep] transferring', amount.toString(), 'to', sweepTo)
     await walletClient.writeContract({
       address: currency,
       abi: erc20Abi,
       functionName: 'transfer',
-      args: [sweepTo, balance - gasReserve],
+      args: [sweepTo, amount],
       account,
     })
+    console.log('[sweep] done')
   } catch (err) {
     console.error('[sweep] failed:', err)
   }
