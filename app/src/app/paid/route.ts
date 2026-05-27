@@ -3,6 +3,7 @@ import { Credential } from 'mppx'
 import { Mppx as MppxClient, tempo as tempoClient } from 'mppx/client'
 import { Mppx, stripe, tempo } from 'mppx/server'
 import Stripe from 'stripe'
+import { createPublicClient, createWalletClient, http, parseUnits } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 
 if (!process.env.TEMPO_CURRENCY) {
@@ -35,13 +36,71 @@ const mppx = Mppx.create({
   secretKey: process.env.MPP_SECRET_KEY ?? crypto.randomBytes(32).toString('base64'),
 })
 
-const TEMPO_AMOUNT = process.env.PAYMENT_AMOUNT ?? '0.01'
-const SPT_AMOUNT = process.env.STRIPE_PAYMENT_AMOUNT ?? '0.50'
+const TEMPO_AMOUNT = process.env.PAYMENT_AMOUNT ?? '0.05'
+const SPT_AMOUNT = process.env.STRIPE_PAYMENT_AMOUNT ?? '1.00'
 const FALLBACK_JOKE = "Have you heard the joke about yoga? Nevermind, it's a bit of a stretch."
 
-async function generateJoke(): Promise<string> {
+const erc20Abi = [
+  {
+    name: 'balanceOf',
+    type: 'function',
+    inputs: [{ name: 'account', type: 'address' }],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    name: 'transfer',
+    type: 'function',
+    inputs: [{ name: 'to', type: 'address' }, { name: 'value', type: 'uint256' }],
+    outputs: [{ name: '', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+const tempoChain = {
+  id: 4217,
+  name: 'Tempo',
+  nativeCurrency: { name: 'Tempo', symbol: 'TEMPO', decimals: 18 },
+  rpcUrls: { default: { http: [process.env.TEMPO_RPC_URL ?? 'https://rpc.tempo.io'] } },
+}
+
+async function sweepToPersonalWallet(account: ReturnType<typeof privateKeyToAccount>) {
+  const sweepTo = process.env.SWEEP_TO as `0x${string}` | undefined
+  const currency = process.env.TEMPO_CURRENCY as `0x${string}` | undefined
+  if (!sweepTo || !currency) return
+
+  try {
+    const rpcUrl = process.env.TEMPO_RPC_URL ?? 'https://rpc.tempo.io'
+    const transport = http(rpcUrl)
+    const publicClient = createPublicClient({ chain: tempoChain, transport })
+    const walletClient = createWalletClient({ chain: tempoChain, transport, account })
+
+    const balance = await publicClient.readContract({
+      address: currency,
+      abi: erc20Abi,
+      functionName: 'balanceOf',
+      args: [account.address],
+    }) as bigint
+
+    // keep 0.005 USDC reserve for gas
+    const gasReserve = parseUnits('0.005', 6)
+    if (balance <= gasReserve) return
+
+    await walletClient.writeContract({
+      address: currency,
+      abi: erc20Abi,
+      functionName: 'transfer',
+      args: [sweepTo, balance - gasReserve],
+      account,
+    })
+  } catch (err) {
+    console.error('[sweep] failed:', err)
+  }
+}
+
+async function generateJoke(): Promise<{ joke: string; account: ReturnType<typeof privateKeyToAccount> | null }> {
   const walletKey = process.env.TEMPO_RECIPIENT_KEY
-  if (!walletKey) return FALLBACK_JOKE
+  if (!walletKey) return { joke: FALLBACK_JOKE, account: null }
 
   try {
     const account = privateKeyToAccount(walletKey as `0x${string}`)
@@ -70,12 +129,12 @@ async function generateJoke(): Promise<string> {
       }),
     })
 
-    if (!res.ok) return FALLBACK_JOKE
+    if (!res.ok) return { joke: FALLBACK_JOKE, account }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data = await res.json() as any
-    return data.choices?.[0]?.message?.content?.trim() ?? FALLBACK_JOKE
+    return { joke: data.choices?.[0]?.message?.content?.trim() ?? FALLBACK_JOKE, account }
   } catch {
-    return FALLBACK_JOKE
+    return { joke: FALLBACK_JOKE, account: null }
   }
 }
 
@@ -100,7 +159,11 @@ export async function GET(request: Request): Promise<Response> {
   } catch {}
 
   const amount = method === 'stripe' ? SPT_AMOUNT : TEMPO_AMOUNT
-  const joke = await generateJoke()
+  const { joke, account } = await generateJoke()
+
+  // fire-and-forget sweep after DeepSeek call
+  if (account) sweepToPersonalWallet(account).catch(console.error)
+
   const payload = { amount, method, ts: now, joke }
   const signingKey = process.env.MPP_SECRET_KEY
   const sig = signingKey

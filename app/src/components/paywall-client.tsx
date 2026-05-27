@@ -55,7 +55,7 @@ export default function PaywallClient({ baseUrl }: Props) {
               onClick={() => copy(mppxCmd, 'mppx')}
             >
               <div className="flex items-baseline justify-between">
-                <span className="text-2xl font-semibold text-white">$0.01 <span className="text-base font-normal text-zinc-300 ml-1">USDC via Tempo</span></span>
+                <span className="text-2xl font-semibold text-white">$0.05 <span className="text-base font-normal text-zinc-300 ml-1">USDC via Tempo</span></span>
                 {copied === 'mppx' ? <Check size={15} className="text-zinc-400" /> : <CopyIcon size={15} className="text-zinc-400" />}
               </div>
               <code className="block text-base font-mono text-zinc-300 truncate">
@@ -68,7 +68,7 @@ export default function PaywallClient({ baseUrl }: Props) {
               onClick={() => copy(linkCmd, 'link')}
             >
               <div className="flex items-baseline justify-between">
-                <span className="text-2xl font-semibold text-zinc-900">$0.50 <span className="text-base font-normal text-zinc-400 ml-1">USD via Link by Stripe</span></span>
+                <span className="text-2xl font-semibold text-zinc-900">$1.00 <span className="text-base font-normal text-zinc-400 ml-1">USD via Link by Stripe</span></span>
                 {copied === 'link' ? <Check size={15} className="text-zinc-400" /> : <CopyIcon size={15} className="text-zinc-400" />}
               </div>
               <code className="block text-base font-mono text-zinc-400 truncate">
