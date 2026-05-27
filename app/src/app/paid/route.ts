@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import { Credential } from 'mppx'
+import { Mppx as MppxClient, tempo as tempoClient } from 'mppx/client'
 import { Mppx, stripe, tempo } from 'mppx/server'
 import Stripe from 'stripe'
 import { privateKeyToAccount } from 'viem/accounts'
@@ -36,6 +37,47 @@ const mppx = Mppx.create({
 
 const TEMPO_AMOUNT = process.env.PAYMENT_AMOUNT ?? '0.01'
 const SPT_AMOUNT = process.env.STRIPE_PAYMENT_AMOUNT ?? '0.50'
+const FALLBACK_JOKE = "Have you heard the joke about yoga? Nevermind, it's a bit of a stretch."
+
+async function generateJoke(): Promise<string> {
+  const walletKey = process.env.TEMPO_RECIPIENT_KEY
+  if (!walletKey) return FALLBACK_JOKE
+
+  try {
+    const account = privateKeyToAccount(walletKey as `0x${string}`)
+    const client = MppxClient.create({
+      polyfill: false,
+      methods: [tempoClient({ account })],
+    })
+
+    const res = await client.fetch('https://deepseek.mpp.paywithlocus.com/deepseek/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a joke writer. Reply with only the joke itself — no setup label, no preamble. Keep it work-appropriate and 1-2 sentences.',
+          },
+          {
+            role: 'user',
+            content: 'Tell me a short, work-appropriate joke in 1-2 sentences.',
+          },
+        ],
+        max_tokens: 100,
+        temperature: 1,
+      }),
+    })
+
+    if (!res.ok) return FALLBACK_JOKE
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data = await res.json() as any
+    return data.choices?.[0]?.message?.content?.trim() ?? FALLBACK_JOKE
+  } catch {
+    return FALLBACK_JOKE
+  }
+}
 
 export async function GET(request: Request): Promise<Response> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -58,7 +100,8 @@ export async function GET(request: Request): Promise<Response> {
   } catch {}
 
   const amount = method === 'stripe' ? SPT_AMOUNT : TEMPO_AMOUNT
-  const payload = { amount, method, ts: now }
+  const joke = await generateJoke()
+  const payload = { amount, method, ts: now, joke }
   const signingKey = process.env.MPP_SECRET_KEY
   const sig = signingKey
     ? crypto.createHmac('sha256', signingKey).update(JSON.stringify(payload)).digest('base64url')
@@ -67,7 +110,7 @@ export async function GET(request: Request): Promise<Response> {
 
   return result.withReceipt(
     Response.json({
-      joke: 'Have you heard the joke about yoga? Nevermind, it\'s a bit of a stretch.',
+      joke,
       timestamp: now,
       successUrl: `${protocol}//${host}/success?token=${token}`,
     }),

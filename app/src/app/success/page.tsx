@@ -4,19 +4,19 @@ import Link from 'next/link'
 
 type SearchParams = Promise<{ token?: string }>
 
-function decodeToken(token: string): { amount: string; method: string; ts: string } | null {
+function decodeToken(token: string): { amount: string; method: string; ts: string; joke: string } | null {
   try {
-    const { amount, method, ts, sig } = JSON.parse(Buffer.from(token, 'base64url').toString())
-    if (!amount || !method || !ts) return null
+    const { amount, method, ts, joke, sig } = JSON.parse(Buffer.from(token, 'base64url').toString())
+    if (!amount || !method || !ts || !joke) return null
     const signingKey = process.env.MPP_SECRET_KEY
     if (signingKey) {
       const expected = crypto
         .createHmac('sha256', signingKey)
-        .update(JSON.stringify({ amount, method, ts }))
+        .update(JSON.stringify({ amount, method, ts, joke }))
         .digest('base64url')
       if (!sig || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null
     }
-    return { amount, method, ts }
+    return { amount, method, ts, joke }
   } catch {
     return null
   }
@@ -27,7 +27,7 @@ export default async function SuccessPage({ searchParams }: { searchParams: Sear
   const data = token ? decodeToken(token) : null
   if (!data) redirect('/')
 
-  const { amount, method, ts } = data
+  const { amount, method, ts, joke } = data
   const timestamp = new Date(ts).toLocaleString()
   const currency = method === 'stripe' ? 'USD' : 'USDC'
 
@@ -51,7 +51,7 @@ export default async function SuccessPage({ searchParams }: { searchParams: Sear
             Payment verified
           </div>
           <p className="text-3xl font-semibold tracking-tight text-zinc-900 leading-snug">
-            Have you heard the joke about yoga? Nevermind, it's a bit of a stretch.
+            {joke}
           </p>
         </div>
 
@@ -59,11 +59,11 @@ export default async function SuccessPage({ searchParams }: { searchParams: Sear
         <div className="space-y-2 text-sm text-zinc-500">
           <div className="flex justify-between py-2 border-b border-zinc-100">
             <span>Amount</span>
-            <span className="text-zinc-900 font-medium">{amount ?? '0.01'} {currency}</span>
+            <span className="text-zinc-900 font-medium">{amount} {currency}</span>
           </div>
           <div className="flex justify-between py-2 border-b border-zinc-100">
             <span>Method</span>
-            <span className="text-zinc-900 font-medium capitalize">{method ?? 'tempo'}</span>
+            <span className="text-zinc-900 font-medium capitalize">{method}</span>
           </div>
           <div className="flex justify-between py-2 border-b border-zinc-100">
             <span>Time</span>
