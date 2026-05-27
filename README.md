@@ -4,6 +4,16 @@ Demo of both sides of [MPP](https://mpp.dev) — selling and buying machine paym
 
 Pay to unlock a joke at [mpp-demo-eta.vercel.app](https://mpp-demo-eta.vercel.app).
 
-**Tempo (USDC.e)** — payment received, then the server immediately spends it to call the DeepSeek service from [mpp.dev/services](https://mpp.dev/services) to generate a fresh joke. The server wallet sweeps any remaining balance to a personal wallet after each request.
+## Endpoints
 
-**Link (USD)** — payment processed over Stripe rails. Works end-to-end, but USD can't yet be spent on MPP-gated APIs — USD can't be spent via MPP out of a Stripe Balance or Financial Account — so the joke comes from a static fallback.
+**`/paid/onchain`** — direct on-chain payment via Tempo (USDC.e). Payment received, then the server immediately spends it to call OpenAI via [mpp.dev/services](https://mpp.dev/services) to generate a fresh joke. Remaining balance sweeps to a personal wallet after each request.
+
+**`/paid/stripe`** — Stripe-backed payments. Accepts USDC.e via Stripe crypto (deposit address per request) or USD via Link (SPT). USD can't yet be spent on MPP-gated APIs, so the joke comes from a static fallback.
+
+## Payment methods
+
+| Method | Endpoint | Currency | Joke |
+|--------|----------|----------|------|
+| `npx mppx` / `tempo request` | `/paid/onchain` | USDC.e | Fresh from OpenAI via MPP |
+| `npx mppx` / `tempo request` | `/paid/stripe` | USDC.e | Fallback |
+| `link-cli mpp pay` | `/paid/stripe` | USD | Fallback |
