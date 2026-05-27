@@ -132,7 +132,7 @@ async function generateJoke(): Promise<{ joke: string; account: ReturnType<typeo
     if (!res.ok) return { joke: FALLBACK_JOKE, account }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data = await res.json() as any
-    return { joke: data.choices?.[0]?.message?.content?.trim() ?? FALLBACK_JOKE, account }
+    return { joke: data.data?.choices?.[0]?.message?.content?.trim() ?? FALLBACK_JOKE, account }
   } catch {
     return { joke: FALLBACK_JOKE, account: null }
   }
