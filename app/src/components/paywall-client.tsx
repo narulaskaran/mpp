@@ -45,7 +45,7 @@ export default function PaywallClient({ baseUrl }: Props) {
           {/* Hero */}
           <div className="space-y-4">
             <h1 className="text-4xl font-semibold text-zinc-900 tracking-tight leading-tight font-sans">
-              There's a joke<br />behind this paywall.
+              There's a joke<br />behind this <span style={{ color: '#00A63A' }}>paywall.</span>
             </h1>
             <p className="text-lg text-zinc-500">
               Works for humans and AI agents alike.{' '}
@@ -59,11 +59,13 @@ export default function PaywallClient({ baseUrl }: Props) {
           {/* Options */}
           <div className="space-y-4">
 
-            {/* Tempo card — merged, two commands */}
-            <div className="w-full bg-zinc-700 rounded-2xl px-6 py-5 space-y-4">
-              <span className="text-2xl font-semibold text-white">$0.05 <span className="text-base font-normal text-zinc-300 ml-1">USDC.e via Tempo</span></span>
-
-              <div className="space-y-2">
+            {/* Tempo option */}
+            <div className="bg-zinc-50 rounded-3xl p-5 space-y-2">
+              <div className="flex items-baseline gap-2 px-1">
+                <span className="text-2xl font-semibold text-zinc-900">$0.05</span>
+                <span className="text-sm text-zinc-400">USDC.e via Tempo</span>
+              </div>
+              <div className="w-full bg-zinc-700 rounded-2xl px-4 py-3 space-y-1">
                 <button
                   className="w-full text-left hover:bg-zinc-600 active:bg-zinc-800 transition-colors rounded-xl px-3 py-2 flex items-center justify-between gap-4 cursor-pointer"
                   onClick={() => copy(mppxCmd, 'mppx')}
@@ -73,7 +75,6 @@ export default function PaywallClient({ baseUrl }: Props) {
                   </code>
                   {copied === 'mppx' ? <Check size={13} className="text-zinc-400 shrink-0" /> : <CopyIcon size={13} className="text-zinc-400 shrink-0" />}
                 </button>
-
                 <button
                   className="w-full text-left hover:bg-zinc-600 active:bg-zinc-800 transition-colors rounded-xl px-3 py-2 flex items-center justify-between gap-4 cursor-pointer"
                   onClick={() => copy(tempoCmd, 'tempo')}
@@ -86,26 +87,30 @@ export default function PaywallClient({ baseUrl }: Props) {
               </div>
             </div>
 
-            {/* Link card */}
-            <div className="w-full rounded-2xl px-6 py-5 space-y-4" style={{ backgroundColor: '#00A63A' }}>
-              <span className="text-2xl font-semibold text-white">$1.00 <span className="text-base font-normal ml-1" style={{ color: 'rgba(255,255,255,0.75)' }}>USD via Link</span></span>
-
-              <button
-                className="w-full text-left rounded-xl px-3 py-2 flex items-center justify-between gap-4 cursor-pointer transition-colors"
-                style={{ backgroundColor: 'transparent' }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.12)')}
-                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-                onMouseDown={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.2)')}
-                onMouseUp={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.12)')}
-                onClick={() => copy(linkCmd, 'link')}
-              >
-                <code className="text-sm font-mono truncate" style={{ color: 'rgba(255,255,255,0.9)' }}>
-                  <span style={{ color: 'rgba(255,255,255,0.5)' }}>$ </span>{linkCmd}
-                </code>
-                {copied === 'link'
-                  ? <Check size={13} style={{ color: 'rgba(255,255,255,0.6)' }} className="shrink-0" />
-                  : <CopyIcon size={13} style={{ color: 'rgba(255,255,255,0.6)' }} className="shrink-0" />}
-              </button>
+            {/* Link option */}
+            <div className="bg-zinc-50 rounded-3xl p-5 space-y-2">
+              <div className="flex items-baseline gap-2 px-1">
+                <span className="text-2xl font-semibold text-zinc-900">$1.00</span>
+                <span className="text-sm text-zinc-400">USD via Link</span>
+              </div>
+              <div className="w-full rounded-2xl px-4 py-3" style={{ backgroundColor: '#00A63A' }}>
+                <button
+                  className="w-full text-left rounded-xl px-3 py-2 flex items-center justify-between gap-4 cursor-pointer transition-colors"
+                  style={{ backgroundColor: 'transparent' }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.12)')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                  onMouseDown={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.2)')}
+                  onMouseUp={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.12)')}
+                  onClick={() => copy(linkCmd, 'link')}
+                >
+                  <code className="text-sm font-mono truncate" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                    <span style={{ color: 'rgba(255,255,255,0.5)' }}>$ </span>{linkCmd}
+                  </code>
+                  {copied === 'link'
+                    ? <Check size={13} style={{ color: 'rgba(255,255,255,0.6)' }} className="shrink-0" />
+                    : <CopyIcon size={13} style={{ color: 'rgba(255,255,255,0.6)' }} className="shrink-0" />}
+                </button>
+              </div>
             </div>
 
           </div>
