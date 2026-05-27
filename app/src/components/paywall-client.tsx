@@ -48,7 +48,7 @@ export default function PaywallClient({ baseUrl }: Props) {
               There's a joke<br />behind this paywall.
             </h1>
             <p className="text-lg text-zinc-500">
-              Pay once to unlock it — works for humans and AI agents alike.{' '}
+              Works for humans and AI agents alike.{' '}
               <a href="https://mpp.dev" target="_blank" rel="noopener noreferrer"
                 className="text-zinc-400 underline underline-offset-4 hover:text-zinc-600 transition-colors">
                 What is MPP?
