@@ -69,7 +69,7 @@ async function generateJoke(): Promise<{ joke: string; account: ReturnType<typeo
   try {
     const client = MppxClient.create({
       polyfill: false,
-      methods: [tempoClient({ account })],
+      methods: [tempoClient({ account, maxDeposit: '2.0' })],
     })
 
     const res = await client.fetch('https://openai.mpp.tempo.xyz/v1/chat/completions', {
