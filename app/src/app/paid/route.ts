@@ -4,8 +4,10 @@ import { Credential } from 'mppx'
 import { Mppx as MppxClient, tempo as tempoClient } from 'mppx/client'
 import { Mppx, stripe, tempo } from 'mppx/server'
 import Stripe from 'stripe'
-import { createPublicClient, createWalletClient, http, parseUnits } from 'viem'
+import { createClient, http, parseUnits } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
+import { tempo as tempoChain } from 'viem/chains'
+import { Actions } from 'viem/tempo'
 
 if (!process.env.TEMPO_CURRENCY) {
   console.warn('[mpp] TEMPO_CURRENCY not set — set to pathUSD contract address for your network')
@@ -41,30 +43,6 @@ const TEMPO_AMOUNT = process.env.PAYMENT_AMOUNT ?? '0.05'
 const SPT_AMOUNT = process.env.STRIPE_PAYMENT_AMOUNT ?? '1.00'
 const FALLBACK_JOKE = "Have you heard the joke about yoga? Nevermind, it's a bit of a stretch."
 
-const erc20Abi = [
-  {
-    name: 'balanceOf',
-    type: 'function',
-    inputs: [{ name: 'account', type: 'address' }],
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    name: 'transfer',
-    type: 'function',
-    inputs: [{ name: 'to', type: 'address' }, { name: 'value', type: 'uint256' }],
-    outputs: [{ name: '', type: 'bool' }],
-    stateMutability: 'nonpayable',
-  },
-] as const
-
-const tempoChain = {
-  id: 4217,
-  name: 'Tempo',
-  nativeCurrency: { name: 'Tempo', symbol: 'TEMPO', decimals: 18 },
-  rpcUrls: { default: { http: [process.env.TEMPO_RPC_URL ?? 'https://rpc.tempo.xyz'] } },
-}
-
 async function sweepToPersonalWallet(account: ReturnType<typeof privateKeyToAccount>) {
   const sweepTo = process.env.SWEEP_TO as `0x${string}` | undefined
   const currency = process.env.TEMPO_CURRENCY as `0x${string}` | undefined
@@ -75,18 +53,13 @@ async function sweepToPersonalWallet(account: ReturnType<typeof privateKeyToAcco
 
   try {
     const rpcUrl = process.env.TEMPO_RPC_URL ?? 'https://rpc.tempo.xyz'
-    const transport = http(rpcUrl)
-    const publicClient = createPublicClient({ chain: tempoChain, transport })
-    const walletClient = createWalletClient({ chain: tempoChain, transport, account })
+    const client = createClient({ chain: tempoChain, transport: http(rpcUrl), account })
 
-    const balance = await publicClient.readContract({
-      address: currency,
-      abi: erc20Abi,
-      functionName: 'balanceOf',
-      args: [account.address],
-    }) as bigint
+    const balance = await Actions.token.getBalance(client, {
+      account: account.address,
+      token: currency,
+    })
 
-    // keep 0.005 USDC reserve for gas
     const gasReserve = parseUnits('0.005', 6)
     if (balance <= gasReserve) {
       console.log('[sweep] skipped: balance at or below reserve', balance.toString())
@@ -95,12 +68,10 @@ async function sweepToPersonalWallet(account: ReturnType<typeof privateKeyToAcco
 
     const amount = balance - gasReserve
     console.log('[sweep] transferring', amount.toString(), 'to', sweepTo)
-    await walletClient.writeContract({
-      address: currency,
-      abi: erc20Abi,
-      functionName: 'transfer',
-      args: [sweepTo, amount],
-      account,
+    await Actions.token.transferSync(client, {
+      amount,
+      token: currency,
+      to: sweepTo,
     })
     console.log('[sweep] done')
   } catch (err) {
