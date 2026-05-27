@@ -55,7 +55,7 @@ export default function PaywallClient({ baseUrl }: Props) {
               onClick={() => copy(mppxCmd, 'mppx')}
             >
               <div className="flex items-baseline justify-between">
-                <span className="text-2xl font-semibold text-white">$0.05 <span className="text-base font-normal text-zinc-300 ml-1">USDC via Tempo</span></span>
+                <span className="text-2xl font-semibold text-white">$0.05 <span className="text-base font-normal text-zinc-300 ml-1">USDC.e via Tempo</span></span>
                 {copied === 'mppx' ? <Check size={15} className="text-zinc-400" /> : <CopyIcon size={15} className="text-zinc-400" />}
               </div>
               <code className="block text-base font-mono text-zinc-300 truncate">
