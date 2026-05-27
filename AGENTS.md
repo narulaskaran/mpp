@@ -34,3 +34,9 @@ Next.js app in `app/`. Two paid endpoints:
 ## Crypto via Stripe
 
 `createPayToAddress` in `/paid/stripe/route.ts` creates a fresh Stripe PaymentIntent per request (`payment_method_types: ['crypto']`, `mode: 'deposit'`, `networks: ['tempo']`). Deposit address cached in-memory (5 min TTL). For production swap the Map for Redis.
+
+## Gotchas
+
+- `TEMPO_TESTNET` must match the Stripe key mode. Live key (`sk_live_`) → `TEMPO_TESTNET=false`. Mismatch causes "no matching transfer found" on credential verification.
+- `tempoClient` on the client side (used in `generateJoke`) requires `maxDeposit` set or it throws "No action in context". `maxDeposit` must be ≤ wallet balance at call time.
+- `link-cli mpp pay` requires a pre-created spend request (`link-cli spend-request create ...`). Not a true one-liner.

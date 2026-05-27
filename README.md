@@ -16,4 +16,4 @@ Pay to unlock a joke at [mpp-demo-eta.vercel.app](https://mpp-demo-eta.vercel.ap
 |--------|----------|----------|------|
 | `npx mppx` / `tempo request` | `/paid/onchain` | USDC.e | Fresh from OpenAI via MPP |
 | `npx mppx` / `tempo request` | `/paid/stripe` | USDC.e | Fallback |
-| `link-cli mpp pay` | `/paid/stripe` | USD | Fallback |
+| `link-cli mpp pay` (requires spend request) | `/paid/stripe` | USD | Fallback |
