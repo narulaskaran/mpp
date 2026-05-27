@@ -6,4 +6,4 @@ Pay to unlock a joke at [mpp-demo-eta.vercel.app](https://mpp-demo-eta.vercel.ap
 
 **Tempo (USDC.e)** — payment received, then the server immediately spends it to call the DeepSeek service from [mpp.dev/services](https://mpp.dev/services) to generate a fresh joke. The server wallet sweeps any remaining balance to a personal wallet after each request.
 
-**Link (USD)** — payment processed over Stripe rails. Works end-to-end, but USD can't yet be spent on MPP-gated APIs, so the joke comes from a static fallback.
+**Link (USD)** — payment processed over Stripe rails. Works end-to-end, but USD can't yet be spent on MPP-gated APIs — USD can't be spent via MPP out of a Stripe Balance or Financial Account — so the joke comes from a static fallback.
