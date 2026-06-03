@@ -118,20 +118,15 @@ export default function PaywallClient({ baseUrl }: Props) {
                 ].map(({ cmd, key, tooltip }) => (
                   <div key={key} className="relative group/cmd">
                     <button
-                      className="w-full text-left rounded-xl px-3 py-2 flex items-center justify-between gap-4 cursor-pointer transition-colors"
-                      style={{ backgroundColor: 'transparent' }}
-                      onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.12)')}
-                      onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-                      onMouseDown={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.2)')}
-                      onMouseUp={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.12)')}
+                      className="w-full text-left rounded-xl px-3 py-2 flex items-center justify-between gap-4 cursor-pointer transition-colors hover:bg-black/10 active:bg-black/20"
                       onClick={() => copy(cmd, key)}
                     >
-                      <code className="text-sm font-mono truncate" style={{ color: 'rgba(255,255,255,0.9)' }}>
-                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>$ </span>{cmd}
+                      <code className="text-sm font-mono truncate text-white/90">
+                        <span className="text-white/50">$ </span>{cmd}
                       </code>
                       {copied === key
-                        ? <Check size={13} style={{ color: 'rgba(255,255,255,0.6)' }} className="shrink-0" />
-                        : <CopyIcon size={13} style={{ color: 'rgba(255,255,255,0.6)' }} className="shrink-0" />}
+                        ? <Check size={13} className="text-white/60 shrink-0" />
+                        : <CopyIcon size={13} className="text-white/60 shrink-0" />}
                     </button>
                     {tooltip && (
                       <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-zinc-800 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover/cmd:opacity-100 transition-opacity pointer-events-none z-10">
