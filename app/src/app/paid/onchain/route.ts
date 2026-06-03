@@ -7,6 +7,7 @@ import { createClient, http, parseUnits } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { tempo as tempoChain } from 'viem/chains'
 import { Actions } from 'viem/tempo'
+import { FALLBACK_JOKE, PAYMENT_AMOUNT } from '@/lib/constants'
 
 if (!process.env.TEMPO_CURRENCY) {
   console.warn('[mpp] TEMPO_CURRENCY not set — set to pathUSD contract address for your network')
@@ -26,8 +27,6 @@ const mppx = Mppx.create({
   secretKey: process.env.MPP_SECRET_KEY ?? crypto.randomBytes(32).toString('base64'),
 })
 
-const TEMPO_AMOUNT = process.env.PAYMENT_AMOUNT ?? '0.99'
-const FALLBACK_JOKE = "Have you heard the joke about yoga? Nevermind, it's a bit of a stretch."
 
 async function sweepToPersonalWallet(account: ReturnType<typeof privateKeyToAccount>) {
   const sweepTo = process.env.SWEEP_TO as `0x${string}` | undefined
@@ -106,7 +105,7 @@ async function generateJoke(): Promise<{ joke: string; account: ReturnType<typeo
 
 export async function GET(request: Request): Promise<Response> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const result = await (mppx.compose as any)(['tempo/charge', { amount: TEMPO_AMOUNT }])(request) as Awaited<ReturnType<ReturnType<typeof mppx.compose>>>
+  const result = await (mppx.compose as any)(['tempo/charge', { amount: PAYMENT_AMOUNT }])(request) as Awaited<ReturnType<ReturnType<typeof mppx.compose>>>
 
   if (result.status === 402) return result.challenge
 
@@ -117,12 +116,14 @@ export async function GET(request: Request): Promise<Response> {
   try {
     const authHeader = request.headers.get('authorization')
     if (authHeader) method = Credential.deserialize(authHeader).challenge.method
-  } catch {}
+  } catch (err) {
+    console.error('[onchain] failed to deserialize credential:', err)
+  }
 
   const { joke, account } = await generateJoke()
   if (account) waitUntil(sweepToPersonalWallet(account).catch(console.error))
 
-  const payload = { amount: TEMPO_AMOUNT, method, ts: now, joke }
+  const payload = { amount: PAYMENT_AMOUNT, method, ts: now, joke }
   const signingKey = process.env.MPP_SECRET_KEY
   const sig = signingKey
     ? crypto.createHmac('sha256', signingKey).update(JSON.stringify(payload)).digest('base64url')

@@ -3,6 +3,7 @@ import { Credential } from 'mppx'
 import { Mppx, stripe, tempo } from 'mppx/server'
 import Stripe from 'stripe'
 import { privateKeyToAccount } from 'viem/accounts'
+import { FALLBACK_JOKE, PAYMENT_AMOUNT, STRIPE_PAYMENT_AMOUNT } from '@/lib/constants'
 
 if (!process.env.STRIPE_SECRET_KEY) {
   console.warn('[mpp] STRIPE_SECRET_KEY not set — Stripe payments disabled')
@@ -21,9 +22,6 @@ const stripeClient = process.env.STRIPE_SECRET_KEY
 
 const sptEnabled = !!(stripeClient && process.env.STRIPE_PROFILE_ID)
 
-const TEMPO_AMOUNT = process.env.PAYMENT_AMOUNT ?? '0.99'
-const SPT_AMOUNT = process.env.STRIPE_PAYMENT_AMOUNT ?? '0.99'
-const FALLBACK_JOKE = "Have you heard the joke about yoga? Nevermind, it's a bit of a stretch."
 const MPP_SECRET_KEY = process.env.MPP_SECRET_KEY ?? crypto.randomBytes(32).toString('base64')
 
 // Deposit address -> expiry timestamp. For production use a distributed cache (e.g. Redis).
@@ -55,7 +53,7 @@ async function createPayToAddress(request: Request): Promise<`0x${string}`> {
 
   if (!stripeClient) throw new Error('STRIPE_SECRET_KEY not configured')
 
-  const amountInCents = Math.round(parseFloat(TEMPO_AMOUNT) * 100)
+  const amountInCents = Math.round(parseFloat(PAYMENT_AMOUNT) * 100)
   const pi = await stripeClient.paymentIntents.create({
     amount: amountInCents,
     currency: 'usd',
@@ -107,8 +105,8 @@ export async function GET(request: Request): Promise<Response> {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const composeArgs: any[] = [
-    ['tempo/charge', { amount: TEMPO_AMOUNT }],
-    ...(sptEnabled ? [['stripe/charge', { amount: SPT_AMOUNT, currency: 'usd', decimals: 2 }]] : []),
+    ['tempo/charge', { amount: PAYMENT_AMOUNT }],
+    ...(sptEnabled ? [['stripe/charge', { amount: STRIPE_PAYMENT_AMOUNT, currency: 'usd', decimals: 2 }]] : []),
   ]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const result = await (mppx.compose as any)(...composeArgs)(request) as Awaited<ReturnType<ReturnType<typeof mppx.compose>>>
@@ -122,9 +120,11 @@ export async function GET(request: Request): Promise<Response> {
   try {
     const authHeader = request.headers.get('authorization')
     if (authHeader) method = Credential.deserialize(authHeader).challenge.method
-  } catch {}
+  } catch (err) {
+    console.error('[stripe] failed to deserialize credential:', err)
+  }
 
-  const amount = method === 'stripe' ? SPT_AMOUNT : TEMPO_AMOUNT
+  const amount = method === 'stripe' ? STRIPE_PAYMENT_AMOUNT : PAYMENT_AMOUNT
   const payload = { amount, method, ts: now, joke: FALLBACK_JOKE }
   const signingKey = process.env.MPP_SECRET_KEY
   const sig = signingKey

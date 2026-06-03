@@ -17,7 +17,8 @@ function decodeToken(token: string): { amount: string; method: string; ts: strin
       if (!sig || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null
     }
     return { amount, method, ts, joke }
-  } catch {
+  } catch (err) {
+    console.error('[success] failed to decode token:', err)
     return null
   }
 }
