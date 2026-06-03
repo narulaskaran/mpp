@@ -22,7 +22,7 @@ const stripeClient = process.env.STRIPE_SECRET_KEY
 
 const sptEnabled = !!(stripeClient && process.env.STRIPE_PROFILE_ID)
 
-const MPP_SECRET_KEY = process.env.MPP_SECRET_KEY ?? crypto.randomBytes(32).toString('base64')
+const MPP_SECRET_KEY = process.env.MPP_SECRET_KEY ?? (() => { throw new Error('MPP_SECRET_KEY is required') })()
 
 // Deposit address -> expiry timestamp. For production use a distributed cache (e.g. Redis).
 const depositCache = new Map<string, number>()

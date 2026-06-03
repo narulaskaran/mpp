@@ -24,7 +24,7 @@ const mppx = Mppx.create({
       }),
     }),
   ],
-  secretKey: process.env.MPP_SECRET_KEY ?? crypto.randomBytes(32).toString('base64'),
+  secretKey: process.env.MPP_SECRET_KEY ?? (() => { throw new Error('MPP_SECRET_KEY is required') })(),
 })
 
 
