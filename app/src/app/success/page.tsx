@@ -30,7 +30,7 @@ export default async function SuccessPage({ searchParams }: { searchParams: Sear
 
   const { amount, method, ts, joke } = data
   const timestamp = new Date(ts).toLocaleString()
-  const currency = method === 'stripe' ? 'USD' : 'USDC'
+  const currency = method === 'stripe' ? 'USD' : 'USDC.e'
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-20">
