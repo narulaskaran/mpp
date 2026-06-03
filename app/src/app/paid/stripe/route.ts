@@ -24,10 +24,6 @@ const sptEnabled = !!(stripeClient && process.env.STRIPE_PROFILE_ID)
 
 const MPP_SECRET_KEY = process.env.MPP_SECRET_KEY ?? (() => { throw new Error('MPP_SECRET_KEY is required') })()
 
-// Deposit address -> expiry timestamp. For production use a distributed cache (e.g. Redis).
-const depositCache = new Map<string, number>()
-const CACHE_TTL = 5 * 60 * 1000
-
 async function createPayToAddress(request: Request): Promise<`0x${string}`> {
   const authHeader = request.headers.get('authorization')
   if (authHeader) {
@@ -37,16 +33,14 @@ async function createPayToAddress(request: Request): Promise<`0x${string}`> {
         // SPT credential — stripe.charge handles this, no deposit address needed
         return '0x0000000000000000000000000000000000000000' as `0x${string}`
       }
-      // Tempo credential returning after payment — validate cached deposit address
+      // Tempo credential returning after payment — mppx verifies on-chain payment
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const toAddress = (credential.challenge as any).request?.recipient as `0x${string}` | undefined
       if (!toAddress) throw new Error('No recipient in tempo credential')
-      const expiry = depositCache.get(toAddress)
-      if (!expiry || Date.now() > expiry) throw new Error('Deposit address expired')
       return toAddress
     } catch (e) {
       const msg = e instanceof Error ? e.message : ''
-      if (msg === 'Deposit address expired' || msg === 'No recipient in tempo credential') throw e
+      if (msg === 'No recipient in tempo credential') throw e
       // Credential parse error — fall through to create new PaymentIntent
     }
   }
@@ -73,7 +67,6 @@ async function createPayToAddress(request: Request): Promise<`0x${string}`> {
   if (!address) throw new Error('PaymentIntent returned no crypto deposit address')
 
   console.log(`[stripe-crypto] PI ${pi.id} -> ${address}`)
-  depositCache.set(address, Date.now() + CACHE_TTL)
   return address as `0x${string}`
 }
 
