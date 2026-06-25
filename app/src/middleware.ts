@@ -22,5 +22,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/paid/:path*', '/openapi.json', '/llms.txt', '/.well-known/:path*'],
+  matcher: ['/', '/paid/:path*', '/openapi.json', '/llms.txt', '/.well-known/:path*'],
 }
