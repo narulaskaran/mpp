@@ -35,7 +35,7 @@ function parseWwwAuthToAccepts(header: string): Array<Record<string, unknown>> {
       }
 
       if (method === 'tempo') {
-        entry.asset = 'USDC.e'
+        entry.asset = req.currency ?? 'USDC.e'
         entry.chainId = req.methodDetails?.chainId
       } else if (method === 'stripe') {
         entry.asset = 'USD'
