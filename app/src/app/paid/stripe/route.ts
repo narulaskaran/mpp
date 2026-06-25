@@ -4,6 +4,7 @@ import { Mppx, stripe, tempo } from 'mppx/server'
 import Stripe from 'stripe'
 import { privateKeyToAccount } from 'viem/accounts'
 import { FALLBACK_JOKE, PAYMENT_AMOUNT, STRIPE_PAYMENT_AMOUNT } from '@/lib/constants'
+import { withX402Header } from '@/lib/x402'
 
 if (!process.env.STRIPE_SECRET_KEY) {
   console.warn('[mpp] STRIPE_SECRET_KEY not set — Stripe payments disabled')
@@ -104,7 +105,7 @@ export async function GET(request: Request): Promise<Response> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const result = await (mppx.compose as any)(...composeArgs)(request) as Awaited<ReturnType<ReturnType<typeof mppx.compose>>>
 
-  if (result.status === 402) return result.challenge
+  if (result.status === 402) return withX402Header(result.challenge)
 
   const { protocol, host } = new URL(request.url)
   const now = new Date().toISOString()

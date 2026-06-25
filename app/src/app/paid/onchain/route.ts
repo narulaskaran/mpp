@@ -8,6 +8,7 @@ import { privateKeyToAccount } from 'viem/accounts'
 import { tempo as tempoChain } from 'viem/chains'
 import { Actions } from 'viem/tempo'
 import { FALLBACK_JOKE, PAYMENT_AMOUNT } from '@/lib/constants'
+import { withX402Header } from '@/lib/x402'
 
 if (!process.env.TEMPO_CURRENCY) {
   console.warn('[mpp] TEMPO_CURRENCY not set — set to pathUSD contract address for your network')
@@ -107,7 +108,7 @@ export async function GET(request: Request): Promise<Response> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const result = await (mppx.compose as any)(['tempo/charge', { amount: PAYMENT_AMOUNT }])(request) as Awaited<ReturnType<ReturnType<typeof mppx.compose>>>
 
-  if (result.status === 402) return result.challenge
+  if (result.status === 402) return withX402Header(result.challenge)
 
   const { protocol, host } = new URL(request.url)
   const now = new Date().toISOString()
