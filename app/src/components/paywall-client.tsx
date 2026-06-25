@@ -7,10 +7,13 @@ type Props = { baseUrl: string }
 
 export default function PaywallClient({ baseUrl }: Props) {
   const onchainUrl = `${baseUrl}/paid/onchain`
+  const onchainTestnetUrl = `${onchainUrl}?testnet=true`
   const stripeUrl = `${baseUrl}/paid/stripe`
 
   const onchain_mppx = `npx mppx ${onchainUrl}`
   const onchain_tempo = `tempo request ${onchainUrl}`
+  const onchain_testnet_mppx = `npx mppx ${onchainTestnetUrl} --rpc-url https://rpc.moderato.tempo.xyz`
+  const onchain_testnet_tempo = `tempo request ${onchainTestnetUrl}`
   const stripe_link = `link-cli mpp pay ${stripeUrl}`
   const stripe_mppx = `npx mppx ${stripeUrl}`
   const stripe_tempo = `tempo request ${stripeUrl}`
@@ -94,6 +97,24 @@ export default function PaywallClient({ baseUrl }: Props) {
                     <span className="text-zinc-500">$ </span>{onchain_tempo}
                   </code>
                   {copied === 'onchain_tempo' ? <Check size={13} className="text-zinc-400 shrink-0" /> : <CopyIcon size={13} className="text-zinc-400 shrink-0" />}
+                </button>
+                <button
+                  className="w-full text-left hover:bg-zinc-600 active:bg-zinc-800 transition-colors rounded-xl px-3 py-2 flex items-center justify-between gap-4 cursor-pointer"
+                  onClick={() => copy(onchain_testnet_mppx, 'onchain_testnet_mppx')}
+                >
+                  <code className="text-sm font-mono text-zinc-300 truncate">
+                    <span className="text-zinc-500">$ </span>{onchain_testnet_mppx}
+                  </code>
+                  {copied === 'onchain_testnet_mppx' ? <Check size={13} className="text-zinc-400 shrink-0" /> : <CopyIcon size={13} className="text-zinc-400 shrink-0" />}
+                </button>
+                <button
+                  className="w-full text-left hover:bg-zinc-600 active:bg-zinc-800 transition-colors rounded-xl px-3 py-2 flex items-center justify-between gap-4 cursor-pointer"
+                  onClick={() => copy(onchain_testnet_tempo, 'onchain_testnet_tempo')}
+                >
+                  <code className="text-sm font-mono text-zinc-300 truncate">
+                    <span className="text-zinc-500">$ </span>{onchain_testnet_tempo}
+                  </code>
+                  {copied === 'onchain_testnet_tempo' ? <Check size={13} className="text-zinc-400 shrink-0" /> : <CopyIcon size={13} className="text-zinc-400 shrink-0" />}
                 </button>
               </div>
             </div>
