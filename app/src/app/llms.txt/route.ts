@@ -18,7 +18,8 @@ const content = `# MPP Demo — Machine-Payable Joke API
 
 ## Payment details
 
-- Amount: $0.99 USD equivalent
+- Crypto amount: $0.01 USD equivalent
+- SPT amount: $0.50 USD
 - On-chain: USDC.e on Tempo network
 - Fiat: Card or Link via Stripe (when available)
 
