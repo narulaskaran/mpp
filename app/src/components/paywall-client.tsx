@@ -50,7 +50,7 @@ export default function PaywallClient({ baseUrl }: Props) {
           {/* Hero */}
           <div className="space-y-4">
             <h1 className="text-4xl font-semibold text-zinc-900 tracking-tight leading-tight font-sans">
-              There&apos;s a joke<br />behind this <span style={{ color: '#00A63A' }}>$0.01</span> paywall.
+              There&apos;s a joke<br />behind this <span style={{ color: '#00A63A' }}>$0.99</span> paywall.
             </h1>
             <p className="text-lg text-zinc-500">
               Works for humans and AI agents alike.{' '}
